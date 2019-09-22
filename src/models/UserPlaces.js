@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         allowNull: false,
         validate: {
-          isInt: true
+          notEmpty: true
         }
       },
       place_id: {
@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         allowNull: false,
         validate: {
-          isInt: true
+          notEmpty: true
         }
       }
     },
