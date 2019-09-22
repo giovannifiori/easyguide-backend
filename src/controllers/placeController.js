@@ -24,6 +24,30 @@ const getPlaceInfo = async function(req, res) {
   }
 };
 
+const savePlaceReview = async function(req, res) {
+  try {
+    const { text, grade, items, userId } = req.body;
+    const { id: placeId } = req.params;
+
+    if (!grade || !userId || !placeId || !items || items.length === 0) {
+      throw new BadRequestException('One or more parameters are missing');
+    }
+
+    const newReviewRecord = await Review.build({
+      text,
+      grade,
+      user_id: userId,
+      place_id: placeId
+    }).save();
+
+    await newReviewRecord.setReviewItems(items);
+
+    return res.status(HttpStatusCodes.CREATED).json({ id: newReviewRecord.id });
+  } catch (e) {
+    return exceptionHandler(e, res);
+  }
+};
+
 const getPlaceReviews = async (placeId, limit, offset) => {
   const reviews = await Review.findAll({
     where: {
@@ -46,5 +70,6 @@ const getPlaceReviews = async (placeId, limit, offset) => {
 };
 
 module.exports = {
-  getPlaceInfo
+  getPlaceInfo,
+  savePlaceReview
 };
