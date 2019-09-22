@@ -6,10 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       text: {
         type: DataTypes.STRING,
         allowNull: true,
-        defaultValue: '',
-        validate: {
-          isAlphanumeric: true
-        }
+        defaultValue: ''
       },
       grade: {
         type: DataTypes.INTEGER,
