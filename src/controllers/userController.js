@@ -1,4 +1,4 @@
-const { UserPlaces } = require('../models');
+const { UserPlaces, Review, DisabilityItem } = require('../models');
 const HttpStatusCodes = require('../common/util/HttpStatusCodes');
 const {
   exceptionHandler,
@@ -44,7 +44,41 @@ const saveNewFavoritePlace = async function(req, res) {
   }
 };
 
+const getReviews = async (req, res) => {
+  try {
+    const { id: userId } = req.params;
+
+    const { limit, offset } = req.query;
+
+    if (offset && !limit) {
+      throw new BadRequestException('offset only allowed paired with a limit');
+    }
+
+    const reviews = await Review.findAll({
+      where: {
+        user_id: userId
+      },
+      include: [
+        {
+          model: DisabilityItem,
+          as: 'reviewItems',
+          required: true,
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
+        }
+      ],
+      limit,
+      offset
+    });
+
+    return res.status(HttpStatusCodes.SUCCESS).json(reviews);
+  } catch (e) {
+    return exceptionHandler(e, res);
+  }
+};
+
 module.exports = {
   getFavoritePlaces,
-  saveNewFavoritePlace
+  saveNewFavoritePlace,
+  getReviews
 };
