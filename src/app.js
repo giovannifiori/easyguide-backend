@@ -10,6 +10,8 @@ const HttpStatusCodes = require('./common/util/HttpStatusCodes');
 
 const NotFoundException = require('./common/exceptions/NotFoundException');
 
+const disabilityRouter = require('./routers/disabilityRouter');
+
 const HTTP_LOGGING_FILENAME = 'requests.log';
 
 const app = express();
@@ -34,6 +36,7 @@ app.use(
 app.use(logger('dev'));
 
 //routes
+app.use('/api/disabilities', disabilityRouter);
 
 app.route('*').all((req, res) => {
   res.status(HttpStatusCodes.NOT_FOUND).json(new NotFoundException());
