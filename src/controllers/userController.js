@@ -1,6 +1,9 @@
 const { UserPlaces } = require('../models');
 const HttpStatusCodes = require('../common/util/HttpStatusCodes');
-const { exceptionHandler } = require('../common/exceptions');
+const {
+  exceptionHandler,
+  BadRequestException
+} = require('../common/exceptions');
 
 const getFavoritePlaces = async function(req, res) {
   try {
@@ -21,6 +24,27 @@ const getFavoritePlaces = async function(req, res) {
   }
 };
 
+const saveNewFavoritePlace = async function(req, res) {
+  try {
+    const { id: placeId } = req.body;
+    const { id: userId } = req.params;
+
+    if (!placeId) {
+      throw new BadRequestException('placeId must not be null or empty');
+    }
+
+    const newRecord = await UserPlaces.build({
+      user_id: userId,
+      place_id: placeId
+    }).save();
+
+    return res.status(HttpStatusCodes.CREATED).json(newRecord);
+  } catch (e) {
+    return exceptionHandler(e, res);
+  }
+};
+
 module.exports = {
-  getFavoritePlaces
+  getFavoritePlaces,
+  saveNewFavoritePlace
 };
