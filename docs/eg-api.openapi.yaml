@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: Easy Guide API
+  description: The data source for the Easy Guide mobile app.
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:3001/api
+    description: The development server
+
+paths:
+  /places/{id}:
+    get:
+      summary: Returns info of the specified place.
+      responses:
+        '200':
+          description: Place info.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Place'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        name:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+    Place:
+      type: object
+      properties:
+        reviews:
+          type: string
