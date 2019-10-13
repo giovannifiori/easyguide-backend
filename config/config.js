@@ -3,14 +3,14 @@ module.exports = {
     username: 'easyguide',
     password: 'eg1234',
     database: 'easyguide_db',
-    host: '127.0.0.1',
+    host: 'localhost',
     dialect: 'postgres'
   },
   test: {
     username: 'easyguide',
     password: 'eg1234',
     database: 'easyguide_db',
-    host: '127.0.0.1',
+    host: 'localhost',
     dialect: 'postgres'
   },
   production: {
