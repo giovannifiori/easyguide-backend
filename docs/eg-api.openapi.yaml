@@ -29,6 +29,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /places/search:
+    get:
+      summary: Returns a list of places whose name matches que queried text.
+      tags:
+        - Place
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+          required: true
+          allowEmptyValue: false
+          description: The text that will be searched
+        - name: location
+          in: query
+          schema:
+            type: string
+          required: false
+          allowEmptyValue: false
+          description: 'The latitude and longitude in the format of: lat,lng'
+        - name: radius
+          in: query
+          schema:
+            type: integer
+            format: int32
+          required: false
+          allowEmptyValue: true
+          description: The radius distance from the location. If present, places in this radius will have priority.
+      responses:
+        '200':
+          description: List of places
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Place'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /places/{id}:
     get:
       summary: Returns info of the specified place.
@@ -40,7 +83,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Place'
+                $ref: '#/components/schemas/PlaceDetails'
         '500':
           description: Internal server error
           content:
@@ -80,6 +123,62 @@ components:
         name:
           type: string
     Place:
+      type: object
+      properties:
+        formatted_address:
+          type: string
+        geometry:
+          type: object
+          properties:
+            location:
+              type: object
+              properties:
+                lat:
+                  type: string
+                lng:
+                  type: string
+        id:
+          type: string
+        name:
+          type: string
+        opening_hours:
+          type: object
+          properties:
+            open_now:
+              type: boolean
+        photos:
+          type: array
+          items:
+            type: object
+            properties:
+              height:
+                type: integer
+                format: int32
+              html_attributions:
+                type: array
+                items:
+                  type: string
+              photo_reference:
+                type: string
+              width:
+                type: integer
+                format: int32
+        place_id:
+          type: string
+        rating:
+          type: number
+          format: float
+        types:
+          type: array
+          items:
+            type: string
+        totalAccessibilityReviews:
+          type: integer
+          format: int32
+        positiveOpinionsPercentage:
+          type: number
+          format: float
+    PlaceDetails:
       type: object
       properties:
         reviews:
