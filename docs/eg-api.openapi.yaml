@@ -9,6 +9,26 @@ servers:
     description: The development server
 
 paths:
+  /disabilities:
+    get:
+      summary: Returns all disability types and subitems
+      tags:
+        - Disability
+      responses:
+        '200':
+          description: List of Disabilities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Disability'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /places/{id}:
     get:
       summary: Returns info of the specified place.
@@ -37,6 +57,26 @@ components:
         status:
           type: integer
           format: int32
+    Disability:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/DisabilityItem'
+    DisabilityItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int 32
+        name:
+          type: string
     Place:
       type: object
       properties:
