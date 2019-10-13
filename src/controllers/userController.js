@@ -62,7 +62,7 @@ const getReviews = async (req, res) => {
         {
           model: DisabilityItem,
           as: 'reviewItems',
-          required: true,
+          required: false,
           attributes: ['id', 'name'],
           through: { attributes: [] }
         }
