@@ -8,16 +8,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: ''
       },
-      grade: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        validate: {
-          isNumeric: true,
-          isInt: true,
-          min: 1,
-          max: 10
-        }
-      },
       user_id: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -31,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           notEmpty: true
         }
+      },
+      is_accessible: {
+        type: DataTypes.ENUM({
+          values: ['NO', 'PARTIALLY', 'YES']
+        }),
+        allowNull: false
       }
     },
     {
