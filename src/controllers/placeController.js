@@ -72,7 +72,7 @@ async function fetchPlaceReviews(placeId, limit, offset) {
       {
         model: DisabilityItem,
         as: 'reviewItems',
-        required: true,
+        required: false,
         attributes: ['id', 'name'],
         through: { attributes: [] }
       }
