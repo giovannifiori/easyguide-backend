@@ -32,6 +32,8 @@ paths:
   /places/{id}:
     get:
       summary: Returns info of the specified place.
+      tags:
+        - Place
       responses:
         '200':
           description: Place info.
@@ -81,4 +83,36 @@ components:
       type: object
       properties:
         reviews:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+    Review:
+      description: A review of a specific place.
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        user_id:
           type: string
+        place_id:
+          type: string
+        is_accessible:
+          $ref: '#/components/schemas/AccessibilityRank'  
+        createdAt:
+          type: string
+          format: timestamp
+        updatedAt:
+          type: string
+          format: timestamp
+        highlights:
+          description: The points mentioned by the reviewer as highlights for this place
+          type: array
+          items:
+            $ref: '#/components/schemas/DisabilityItem'
+    AccessibilityRank:
+      type: string
+      enum:
+        - NO
+        - PARTIALLY
+        - YES
