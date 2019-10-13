@@ -216,6 +216,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+    post:
+      summary: Adds a new favorite place to the user
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          description: User's id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        description: Required fields to save a nem place as favorite
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  description: The place id
+                  type: string
+      responses:
+        '201':
+          description: The new favorite record
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  place_id:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  updatedAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: Bad request. Parameters are missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Error:
@@ -326,10 +379,10 @@ components:
           $ref: '#/components/schemas/AccessibilityRank'  
         createdAt:
           type: string
-          format: timestamp
+          format: date-time
         updatedAt:
           type: string
-          format: timestamp
+          format: date-time
         highlights:
           description: The points mentioned by the reviewer as highlights for this place
           type: array
