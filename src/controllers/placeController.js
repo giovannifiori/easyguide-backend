@@ -136,8 +136,44 @@ async function searchPlaces(req, res) {
   }
 };
 
+async function getNearbyPlaces(req, res) {
+  try {
+    const { location } = req.query;
+
+    if (!location) {
+      throw new BadRequestException('A location is required');
+    }
+
+    const response = await googleApi.get(`place/nearbysearch/${GOOGLE_API_OUTPUT}`, {
+      params: {
+        location,
+        region: 'br',
+        language: 'pt-BR',
+        radius: 3.5 * 1000,
+        type: 'establishment',
+        key: process.env.GOOGLE_API_KEY
+      }
+    });
+
+    if (response.status !== 200 || response.data.status !== GoogleApiStatus.OK) {
+      throw new ServerError('Error fetching places');
+    }
+
+    let results = [
+      ...response.data.results
+    ];
+
+    results = await Promise.all(results.map(async place => fetchPlaceCustomDetails(place)));
+
+    return res.status(HttpStatusCodes.SUCCESS).json(results);
+  } catch (e) {
+    return exceptionHandler(e, res);
+  }
+}
+
 module.exports = {
   getPlaceInfo,
+  getNearbyPlaces,
   savePlaceReview,
   searchPlaces
 };

@@ -72,6 +72,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /places/nearby:
+    get:
+      summary: Returns a list of nearby places in a radius of 3.5KM.
+      tags:
+        - Place
+      parameters:
+        - name: location
+          in: query
+          schema:
+            type: string
+          required: false
+          allowEmptyValue: false
+          description: 'The latitude and longitude in the format of: lat,lng'
+      responses:
+        '200':
+          description: List of places
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Place'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /places/{id}:
     get:
       summary: Returns info of the specified place.
