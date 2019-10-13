@@ -1,11 +1,24 @@
 const { Review, DisabilityItem } = require('../models');
+
+const googleApi = require('../services/googleApi');
 const HttpStatusCodes = require('../common/util/HttpStatusCodes');
+const GoogleApiStatus = require('../common/util/GoogleApiStatus');
 const {
   BadRequestException,
+  ServerError,
   exceptionHandler
 } = require('../common/exceptions');
 
-const getPlaceInfo = async function(req, res) {
+//Constants
+const GOOGLE_API_OUTPUT = 'json'; //json or xml
+const DEFAULT_PLACES_RADIUS = 20 * 1000; //meters
+const PLACE_ACCESSIBILITY = {
+  NOT_ACCESSIBLE: 'NO',
+  PARTIALLY_ACCESSIBLE: 'PARTIALY',
+  ACCESSIBLE: 'YES'
+};
+
+async function getPlaceInfo(req, res) {
   try {
     const place = {};
     const { id } = req.params;
@@ -16,7 +29,7 @@ const getPlaceInfo = async function(req, res) {
       throw new BadRequestException('offset only allowed paired with a limit');
     }
 
-    place.reviews = await getPlaceReviews(id, limit, offset);
+    place.reviews = await fetchPlaceReviews(id, limit, offset);
 
     return res.status(HttpStatusCodes.SUCCESS).json(place);
   } catch (e) {
@@ -24,18 +37,18 @@ const getPlaceInfo = async function(req, res) {
   }
 };
 
-const savePlaceReview = async function(req, res) {
+async function savePlaceReview(req, res) {
   try {
-    const { text, grade, items, userId } = req.body;
+    const { text, isAccessible, items, userId } = req.body;
     const { id: placeId } = req.params;
 
-    if (!grade || !userId || !placeId || !items || items.length === 0) {
+    if (!isAccessible || !userId || !placeId || !items || items.length === 0) {
       throw new BadRequestException('One or more parameters are missing');
     }
 
     const newReviewRecord = await Review.build({
       text,
-      grade,
+      is_accessible: isAccessible,
       user_id: userId,
       place_id: placeId
     }).save();
@@ -48,7 +61,7 @@ const savePlaceReview = async function(req, res) {
   }
 };
 
-const getPlaceReviews = async (placeId, limit, offset) => {
+async function fetchPlaceReviews(placeId, limit, offset) {
   const reviews = await Review.findAll({
     where: {
       place_id: placeId
@@ -69,7 +82,60 @@ const getPlaceReviews = async (placeId, limit, offset) => {
   return reviews;
 };
 
+async function fetchPlaceCustomDetails(place) {
+  const reviews = await Review.findAll({
+    where: {
+      place_id: place.id
+    }
+  });
+
+  place.totalAccessibilityReviews = reviews.length;
+  if(place.totalAccessibilityReviews > 0) {
+    const positiveOpnionReviews = reviews.filter(review => review.is_accessible !== PLACE_ACCESSIBILITY.NOT_ACCESSIBLE);
+    place.positiveOpnionsPercentage = positiveOpnionReviews.length / reviews.length * 100;
+  } else {
+    place.positiveOpnionsPercentage = 0;
+  }
+  return place;
+}
+
+async function searchPlaces(req, res) {
+  try {
+    const { query, location, radius } = req.query;
+
+    if (!query) {
+      throw new BadRequestException('A query is required');
+    }
+
+    const response = await googleApi.get(`place/textsearch/${GOOGLE_API_OUTPUT}`, {
+      params: {
+        location,
+        query,
+        region: 'br',
+        language: 'pt-BR',
+        radius: parseInt(radius) || DEFAULT_PLACES_RADIUS,
+        key: process.env.GOOGLE_API_KEY
+      }
+    });
+
+    if (response.status !== 200 || response.data.status !== GoogleApiStatus.OK) {
+      throw new ServerError('Error fetching places');
+    }
+
+    let results = [
+      ...response.data.results
+    ];
+
+    results = await Promise.all(results.map(async place => fetchPlaceCustomDetails(place)));
+
+    return res.status(HttpStatusCodes.SUCCESS).json(results);
+  } catch (e) {
+    return exceptionHandler(e, res);
+  }
+};
+
 module.exports = {
   getPlaceInfo,
-  savePlaceReview
+  savePlaceReview,
+  searchPlaces
 };
