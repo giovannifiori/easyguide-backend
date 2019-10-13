@@ -90,6 +90,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /places/{id}/reviews:
+    post:
+      summary: Creates a new place review.
+      tags:
+        - Place
+      parameters:
+        - name: id
+          in: path
+          description: The place id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Required fields to create and publish a new place review
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                isAccessible:
+                  $ref: '#/components/schemas/AccessibilityRank'
+                userId:
+                  type: string
+                highlights:
+                  type: array
+                  items:
+                    type: integer
+                    format: int32
+                    description: DisabilityItem id
+      responses:
+        '201':
+          description: Review successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int32
+                    description: The created review's id.
+        '400':
+          description: Bad request. Parameters are missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Error:
