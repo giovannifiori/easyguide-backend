@@ -42,7 +42,7 @@ async function savePlaceReview(req, res) {
     const { text, isAccessible, items, userId } = req.body;
     const { id: placeId } = req.params;
 
-    if (!isAccessible || !userId || !placeId || !items || items.length === 0) {
+    if (!isAccessible || !userId || !placeId) {
       throw new BadRequestException('One or more parameters are missing');
     }
 
@@ -53,7 +53,9 @@ async function savePlaceReview(req, res) {
       place_id: placeId
     }).save();
 
-    await newReviewRecord.setReviewItems(items);
+    if(items && items.length > 0) { 
+      await newReviewRecord.setReviewItems(items);
+    }
 
     return res.status(HttpStatusCodes.CREATED).json({ id: newReviewRecord.id });
   } catch (e) {
