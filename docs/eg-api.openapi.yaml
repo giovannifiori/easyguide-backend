@@ -118,6 +118,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /places/photo/:photoreference:
+    get:
+      summary: Returns a image of a place using it's photo reference provided by google.
+      tags:
+        - Place
+      responses:
+        '200':
+          description: The place photo.
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
   /places/{id}/reviews:
     post:
       summary: Creates a new place review.
