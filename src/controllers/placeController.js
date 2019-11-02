@@ -35,7 +35,7 @@ async function getPlaceInfo(req, res) {
   } catch (e) {
     return exceptionHandler(e, res);
   }
-};
+}
 
 async function savePlaceReview(req, res) {
   try {
@@ -53,7 +53,7 @@ async function savePlaceReview(req, res) {
       place_id: placeId
     }).save();
 
-    if(items && items.length > 0) { 
+    if (items && items.length > 0) {
       await newReviewRecord.setReviewItems(items);
     }
 
@@ -61,7 +61,7 @@ async function savePlaceReview(req, res) {
   } catch (e) {
     return exceptionHandler(e, res);
   }
-};
+}
 
 async function fetchPlaceReviews(placeId, limit, offset) {
   const reviews = await Review.findAll({
@@ -82,7 +82,7 @@ async function fetchPlaceReviews(placeId, limit, offset) {
   });
 
   return reviews;
-};
+}
 
 async function fetchPlaceCustomDetails(place) {
   const reviews = await Review.findAll({
@@ -92,11 +92,14 @@ async function fetchPlaceCustomDetails(place) {
   });
 
   place.totalAccessibilityReviews = reviews.length;
-  if(place.totalAccessibilityReviews > 0) {
-    const positiveOpnionReviews = reviews.filter(review => review.is_accessible !== PLACE_ACCESSIBILITY.NOT_ACCESSIBLE);
-    place.positiveOpnionsPercentage = positiveOpnionReviews.length / reviews.length * 100;
+  if (place.totalAccessibilityReviews > 0) {
+    const positiveOpinionReviews = reviews.filter(
+      review => review.is_accessible !== PLACE_ACCESSIBILITY.NOT_ACCESSIBLE
+    );
+    place.positiveOpinionsPercentage =
+      (positiveOpinionReviews.length / reviews.length) * 100;
   } else {
-    place.positiveOpnionsPercentage = 0;
+    place.positiveOpinionsPercentage = 0;
   }
   return place;
 }
@@ -109,32 +112,38 @@ async function searchPlaces(req, res) {
       throw new BadRequestException('A query is required');
     }
 
-    const response = await googleApi.get(`place/textsearch/${GOOGLE_API_OUTPUT}`, {
-      params: {
-        location,
-        query,
-        region: 'br',
-        language: 'pt-BR',
-        radius: parseInt(radius) || DEFAULT_PLACES_RADIUS,
-        key: process.env.GOOGLE_API_KEY
+    const response = await googleApi.get(
+      `place/textsearch/${GOOGLE_API_OUTPUT}`,
+      {
+        params: {
+          location,
+          query,
+          region: 'br',
+          language: 'pt-BR',
+          radius: parseInt(radius) || DEFAULT_PLACES_RADIUS,
+          key: process.env.GOOGLE_API_KEY
+        }
       }
-    });
+    );
 
-    if (response.status !== 200 || response.data.status !== GoogleApiStatus.OK) {
+    if (
+      response.status !== 200 ||
+      response.data.status !== GoogleApiStatus.OK
+    ) {
       throw new ServerError('Error fetching places');
     }
 
-    let results = [
-      ...response.data.results
-    ];
+    let results = [...response.data.results];
 
-    results = await Promise.all(results.map(async place => fetchPlaceCustomDetails(place)));
+    results = await Promise.all(
+      results.map(async place => fetchPlaceCustomDetails(place))
+    );
 
     return res.status(HttpStatusCodes.SUCCESS).json(results);
   } catch (e) {
     return exceptionHandler(e, res);
   }
-};
+}
 
 async function getNearbyPlaces(req, res) {
   try {
@@ -144,26 +153,32 @@ async function getNearbyPlaces(req, res) {
       throw new BadRequestException('A location is required');
     }
 
-    const response = await googleApi.get(`place/nearbysearch/${GOOGLE_API_OUTPUT}`, {
-      params: {
-        location,
-        region: 'br',
-        language: 'pt-BR',
-        radius: 3.5 * 1000,
-        type: 'establishment',
-        key: process.env.GOOGLE_API_KEY
+    const response = await googleApi.get(
+      `place/nearbysearch/${GOOGLE_API_OUTPUT}`,
+      {
+        params: {
+          location,
+          region: 'br',
+          language: 'pt-BR',
+          radius: 3.5 * 1000,
+          type: 'establishment',
+          key: process.env.GOOGLE_API_KEY
+        }
       }
-    });
+    );
 
-    if (response.status !== 200 || response.data.status !== GoogleApiStatus.OK) {
+    if (
+      response.status !== 200 ||
+      response.data.status !== GoogleApiStatus.OK
+    ) {
       throw new ServerError('Error fetching places');
     }
 
-    let results = [
-      ...response.data.results
-    ];
+    let results = [...response.data.results];
 
-    results = await Promise.all(results.map(async place => fetchPlaceCustomDetails(place)));
+    results = await Promise.all(
+      results.map(async place => fetchPlaceCustomDetails(place))
+    );
 
     return res.status(HttpStatusCodes.SUCCESS).json(results);
   } catch (e) {
@@ -171,8 +186,18 @@ async function getNearbyPlaces(req, res) {
   }
 }
 
+async function getPlacePhoto(req, res) {
+  const { photoreference } = req.params;
+  const maxWidth = 600;
+
+  res.redirect(
+    `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photoreference=${photoreference}&key=${process.env.GOOGLE_API_KEY}`
+  );
+}
+
 module.exports = {
   getPlaceInfo,
+  getPlacePhoto,
   getNearbyPlaces,
   savePlaceReview,
   searchPlaces
