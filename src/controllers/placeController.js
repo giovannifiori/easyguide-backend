@@ -87,7 +87,7 @@ async function fetchPlaceReviews(placeId, limit, offset) {
 async function fetchPlaceCustomDetails(place) {
   const reviews = await Review.findAll({
     where: {
-      place_id: place.id
+      place_id: place.place_id
     }
   });
 
@@ -200,5 +200,6 @@ module.exports = {
   getPlacePhoto,
   getNearbyPlaces,
   savePlaceReview,
-  searchPlaces
+  searchPlaces,
+  fetchPlaceCustomDetails
 };
