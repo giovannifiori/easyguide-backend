@@ -7,6 +7,7 @@ const {
 } = require('../common/exceptions');
 const GoogleApi = require('../services/googleApi');
 const GoogleApiStatus = require('../common/util/GoogleApiStatus');
+const { fetchPlaceCustomDetails } = require('./placeController');
 const GOOGLE_API_OUTPUT = 'json'; //json or xml
 
 const getFavoritePlaces = async function(req, res) {
@@ -22,30 +23,39 @@ const getFavoritePlaces = async function(req, res) {
       }
     }).map(p => p.dataValues);
 
-    favoritePlaces = await Promise.all(favoritePlaces.map(async place => {
-      const placesResponse = await GoogleApi.get(`place/details/${GOOGLE_API_OUTPUT}`, {
-        params: {
-          key: process.env.GOOGLE_API_KEY,
-          place_id: place.place_id,
-          region: 'br',
-          language: 'pt-BR',
-          fields: 'formatted_address,geometry,name,photo,type,formatted_phone_number'
+    favoritePlaces = await Promise.all(
+      favoritePlaces.map(async place => {
+        const placesResponse = await GoogleApi.get(
+          `place/details/${GOOGLE_API_OUTPUT}`,
+          {
+            params: {
+              key: process.env.GOOGLE_API_KEY,
+              place_id: place.place_id,
+              region: 'br',
+              language: 'pt-BR',
+              fields:
+                'formatted_address,geometry,name,photo,type,formatted_phone_number'
+            }
+          }
+        );
+
+        if (placesResponse.status !== 200) {
+          throw new ServerError('Failed to fetch places');
         }
-      });
 
-      if (placesResponse.status !== 200) {
-        throw new ServerError('Failed to fetch places');
-      }
+        if (placesResponse.data.status !== GoogleApiStatus.OK) {
+          return null;
+        }
 
-      if(placesResponse.data.status !== GoogleApiStatus.OK) {
-        return null;
-      }
-
-      return {
-        ...place,
-        ...placesResponse.data.result
-      };
-    }));
+        let result = placesResponse.data.result;
+        let customDetails = await fetchPlaceCustomDetails(place);
+        return {
+          ...place,
+          ...result,
+          ...customDetails
+        };
+      })
+    );
 
     return res.status(HttpStatusCodes.SUCCESS).json(favoritePlaces);
   } catch (e) {
