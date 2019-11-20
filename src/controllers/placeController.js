@@ -30,6 +30,7 @@ async function getPlaceInfo(req, res) {
     }
 
     place.reviews = await fetchPlaceReviews(id, limit, offset);
+    place.highlights = parsePlaceHighlights(place.reviews);
 
     return res.status(HttpStatusCodes.SUCCESS).json(place);
   } catch (e) {
@@ -82,6 +83,20 @@ async function fetchPlaceReviews(placeId, limit, offset) {
   });
 
   return reviews;
+}
+
+function parsePlaceHighlights(reviews) {
+  if (reviews.length === 0) return [];
+  const placeHighlights = [];
+  for (const review of reviews) {
+    for (const reviewItem of review.reviewItems) {
+      if (placeHighlights.indexOf(reviewItem.name) === -1) {
+        placeHighlights.push(reviewItem.name);
+      }
+    }
+  }
+
+  return placeHighlights;
 }
 
 async function fetchPlaceCustomDetails(place) {

@@ -419,6 +419,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Review"
+        highlights:
+          description: Items marked as a highlight to the place.
+          type: array
+          items:
+            type: string
     Review:
       description: A review of a specific place.
       type: object
