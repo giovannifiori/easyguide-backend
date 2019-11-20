@@ -15,20 +15,20 @@ paths:
       tags:
         - Disability
       responses:
-        '200':
+        "200":
           description: List of Disabilities
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Disability'
-        '500':
+                  $ref: "#/components/schemas/Disability"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /places/search:
     get:
       summary: Returns a list of places whose name matches que queried text.
@@ -48,7 +48,7 @@ paths:
             type: string
           required: false
           allowEmptyValue: false
-          description: 'The latitude and longitude in the format of: lat,lng'
+          description: "The latitude and longitude in the format of: lat,lng"
         - name: radius
           in: query
           schema:
@@ -58,20 +58,20 @@ paths:
           allowEmptyValue: true
           description: The radius distance from the location. If present, places in this radius will have priority.
       responses:
-        '200':
+        "200":
           description: List of places
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Place'
-        '500':
+                  $ref: "#/components/schemas/Place"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /places/nearby:
     get:
       summary: Returns a list of nearby places in a radius of 3.5KM.
@@ -84,47 +84,61 @@ paths:
             type: string
           required: false
           allowEmptyValue: false
-          description: 'The latitude and longitude in the format of: lat,lng'
+          description: "The latitude and longitude in the format of: lat,lng"
       responses:
-        '200':
+        "200":
           description: List of places
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Place'
-        '500':
+                  $ref: "#/components/schemas/Place"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /places/{id}:
     get:
       summary: Returns info of the specified place.
       tags:
         - Place
+      parameters:
+        - name: id
+          in: path
+          description: The place id.
+          schema:
+            type: string
+          required: true
       responses:
-        '200':
+        "200":
           description: Place info.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlaceDetails'
-        '500':
+                $ref: "#/components/schemas/PlaceDetails"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-  /places/photo/:photoreference:
+                $ref: "#/components/schemas/Error"
+  /places/photo/{photoreference}:
     get:
       summary: Returns a image of a place using it's photo reference provided by google.
       tags:
         - Place
+      parameters:
+        - name: photoreference
+          in: path
+          description: The place's photo reference provided by Google API.
+          schema:
+            type: string
+          required: true
       responses:
-        '200':
+        "200":
           description: The place photo.
           content:
             image/*:
@@ -154,7 +168,7 @@ paths:
                 text:
                   type: string
                 isAccessible:
-                  $ref: '#/components/schemas/AccessibilityRank'
+                  $ref: "#/components/schemas/AccessibilityRank"
                 userId:
                   type: string
                 highlights:
@@ -164,7 +178,7 @@ paths:
                     format: int32
                     description: DisabilityItem id
       responses:
-        '201':
+        "201":
           description: Review successfully created.
           content:
             application/json:
@@ -175,18 +189,18 @@ paths:
                     type: integer
                     format: int32
                     description: The created review's id.
-        '400':
+        "400":
           description: Bad request. Parameters are missing.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /users/{id}/reviews:
     get:
       summary: Returns all reviews made by the user
@@ -215,20 +229,20 @@ paths:
             type: integer
             format: int32
       responses:
-        '200':
+        "200":
           description: A list of reviews
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Review'
-        '500':
+                  $ref: "#/components/schemas/Review"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
   /users/{id}/favorite-places:
     get:
       summary: Returns user's favorite places
@@ -243,20 +257,20 @@ paths:
             type: integer
             format: int32
       responses:
-        '200':
+        "200":
           description: A list of places
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Place'
-        '500':
+                  $ref: "#/components/schemas/Place"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
     post:
       summary: Adds a new favorite place to the user
       tags:
@@ -281,7 +295,7 @@ paths:
                   description: The place id
                   type: string
       responses:
-        '201':
+        "201":
           description: The new favorite record
           content:
             application/json:
@@ -298,18 +312,18 @@ paths:
                   updatedAt:
                     type: string
                     format: date-time
-        '400':
+        "400":
           description: Bad request. Parameters are missing.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '500':
+                $ref: "#/components/schemas/Error"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Error:
@@ -333,7 +347,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/DisabilityItem'
+            $ref: "#/components/schemas/DisabilityItem"
     DisabilityItem:
       type: object
       properties:
@@ -404,7 +418,7 @@ components:
         reviews:
           type: array
           items:
-            $ref: '#/components/schemas/Review'
+            $ref: "#/components/schemas/Review"
     Review:
       description: A review of a specific place.
       type: object
@@ -417,7 +431,7 @@ components:
         place_id:
           type: string
         is_accessible:
-          $ref: '#/components/schemas/AccessibilityRank'  
+          $ref: "#/components/schemas/AccessibilityRank"
         createdAt:
           type: string
           format: date-time
@@ -428,7 +442,7 @@ components:
           description: The points mentioned by the reviewer as highlights for this place
           type: array
           items:
-            $ref: '#/components/schemas/DisabilityItem'
+            $ref: "#/components/schemas/DisabilityItem"
     AccessibilityRank:
       type: string
       enum:
