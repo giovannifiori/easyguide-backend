@@ -39,7 +39,7 @@ async function getPlaceInfo(req, res) {
 
 async function savePlaceReview(req, res) {
   try {
-    const { text, isAccessible, items, userId } = req.body;
+    const { text, isAccessible, highlights, userId } = req.body;
     const { id: placeId } = req.params;
 
     if (!isAccessible || !userId || !placeId) {
@@ -53,8 +53,8 @@ async function savePlaceReview(req, res) {
       place_id: placeId
     }).save();
 
-    if (items && items.length > 0) {
-      await newReviewRecord.setReviewItems(items);
+    if (highlights && highlights.length > 0) {
+      await newReviewRecord.setReviewItems(highlights);
     }
 
     return res.status(HttpStatusCodes.CREATED).json({ id: newReviewRecord.id });
