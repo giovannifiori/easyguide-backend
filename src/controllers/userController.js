@@ -83,6 +83,30 @@ const saveNewFavoritePlace = async function(req, res) {
   }
 };
 
+const removePlaceFromFavorites = async function(req, res) {
+  try {
+    const { id: placeId } = req.body;
+    const { id: userId } = req.params;
+
+    if (!placeId) {
+      throw new BadRequestException('placeId must not be null or empty');
+    }
+
+    const task = await UserPlaces.destroy({
+      where: {
+        place_id: placeId,
+        user_id: userId || ''
+      }
+    });
+
+    console.log('task :', task);
+
+    return res.status(HttpStatusCodes.SUCCESS).json({ deleted: true });
+  } catch (e) {
+    return exceptionHandler(e, res);
+  }
+};
+
 const getReviews = async (req, res) => {
   try {
     const { id: userId } = req.params;
@@ -119,5 +143,6 @@ const getReviews = async (req, res) => {
 module.exports = {
   getFavoritePlaces,
   saveNewFavoritePlace,
+  removePlaceFromFavorites,
   getReviews
 };

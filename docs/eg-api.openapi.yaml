@@ -243,7 +243,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /users/{id}/favorite-places:
+  /users/{id}/favorites:
     get:
       summary: Returns user's favorite places
       tags:
@@ -285,7 +285,7 @@ paths:
             format: int32
       requestBody:
         required: true
-        description: Required fields to save a nem place as favorite
+        description: Required fields to save a new place as favorite
         content:
           application/json:
             schema:
@@ -314,6 +314,51 @@ paths:
                     format: date-time
         "400":
           description: Bad request. Parameters are missing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Removes a place from user's favorites
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          description: User's id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        required: true
+        description: Required fields to remove a place from user's favorites
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  description: The place id
+                  type: string
+      responses:
+        "200":
+          description: Describe deletion status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+        "400":
+          description: Bad request. Parameters are missing or the user does not have this place as favorite.
           content:
             application/json:
               schema:
