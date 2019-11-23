@@ -1,4 +1,4 @@
-const { Review, DisabilityItem } = require('../models');
+const { Review, DisabilityItem, UserPlaces } = require('../models');
 
 const googleApi = require('../services/googleApi');
 const HttpStatusCodes = require('../common/util/HttpStatusCodes');
@@ -23,7 +23,7 @@ async function getPlaceInfo(req, res) {
     const place = {};
     const { id } = req.params;
 
-    const { limit, offset } = req.query;
+    const { limit, offset, userId } = req.query;
 
     if (offset && !limit) {
       throw new BadRequestException('offset only allowed paired with a limit');
@@ -31,11 +31,23 @@ async function getPlaceInfo(req, res) {
 
     place.reviews = await fetchPlaceReviews(id, limit, offset);
     place.highlights = parsePlaceHighlights(place.reviews);
+    place.isFavorite = await isPlaceInUserFavorites(id, userId);
 
     return res.status(HttpStatusCodes.SUCCESS).json(place);
   } catch (e) {
     return exceptionHandler(e, res);
   }
+}
+
+async function isPlaceInUserFavorites(placeId, userId) {
+  const userPlace = await UserPlaces.findOne({
+    where: {
+      place_id: placeId,
+      user_id: userId || ''
+    }
+  });
+
+  return !!userPlace;
 }
 
 async function savePlaceReview(req, res) {
