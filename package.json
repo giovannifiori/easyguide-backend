@@ -4,8 +4,8 @@
   "description": "The REST API that will provide data to be used in Easy Guide app",
   "main": "src/app.js",
   "scripts": {
-    "start-dev": "NODE_ENV=development; nodemon -L src/app",
-    "start": "NODE_ENV=production; pm2 start src/app.js --no-daemon -i max"
+    "start-development": "NODE_ENV=development; nodemon -L src/app",
+    "start-production": "NODE_ENV=production; pm2 start src/app.js --no-daemon -i max"
   },
   "repository": {
     "type": "git",
