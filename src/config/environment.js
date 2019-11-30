@@ -7,7 +7,7 @@ dotenv.config();
 const interfaces = os.networkInterfaces();
 const environment = {
   host: '127.0.0.1',
-  port: process.env.APP_PORT || 3001
+  port: process.env.PORT || 3001
 };
 
 Object.values(interfaces).forEach(interface => {
